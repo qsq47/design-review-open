@@ -1,0 +1,7 @@
+interface:
+  display_name: "Public Design Review"
+  short_description: "Public-safe UI visual fidelity review."
+  default_prompt: "Use $design-review-open to compare a design baseline with implementation evidence and produce a public-safe UI review report."
+
+policy:
+  allow_implicit_invocation: true
