@@ -1,0 +1,41 @@
+# OS/editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Archives and generated exports
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+*.backup
+*.orig
+
+# Private review materials
+screenshots/
+reports/
+evidence/
+artifacts/
+private/
+internal/
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.gif
+*.mp4
+*.mov
+
+# Local environment
+.env
+.env.*
+node_modules/
+__pycache__/
