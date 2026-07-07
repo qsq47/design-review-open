@@ -43,7 +43,15 @@ Collect and list available inputs before reviewing:
 - Optional code: frontend/mobile code, component props, style definitions, token usage, or asset files for root-cause analysis.
 - Optional constraints: public report, internal engineering handoff, client-facing summary, or annotated evidence requirements.
 
-If a critical input is missing, proceed with a clearly stated limitation instead of inventing facts.
+## Baseline Acquisition Order
+
+Before reviewing, establish the design baseline in this exact priority order:
+
+1. **Figma design and node values first.** If the user provides a Figma URL or node ID, first fetch the exact Figma node screenshot and available Dev Mode-style values before judging issues. Collect layout, size, position, spacing, typography, fill/stroke colors, opacity, radius, shadow/effects, component names, variants, variables/tokens, and screenshot baseline when tools permit. Do not skip this step merely because an implementation screenshot or code is available.
+2. **Design specs / knowledge base second.** If Figma cannot be accessed or does not contain the needed values, read available design specifications, component docs, design-token docs, product/category knowledge base, or public design-system rules before generating visual issues. Use these as the secondary baseline and cite them generically in public reports.
+3. **Ask before screenshot-only review.** If both Figma and design/spec/knowledge sources are unavailable or insufficient, ask the user whether to continue with an implementation-only risk report. Do not produce a strict fidelity score or confirmed pixel/token defects without a baseline. Mark affected items as `Baseline missing` or `Needs confirmation`.
+
+If a critical input is missing after following this order, proceed only with a clearly stated limitation and never invent baseline values.
 
 ## Pairing And State Rules
 
@@ -179,14 +187,29 @@ If business availability is unknown, mark state-dependent differences as `Needs 
 
 ## Evidence Images
 
-For final reports, provide visual evidence for each confirmed issue:
+For final reports, provide visual evidence for each confirmed issue using this mandatory format:
 
-- Prefer one annotated crop per issue.
-- Use a red fine outline, issue number, pointer line, and outside note area when possible.
-- Avoid covering the UI being reviewed.
-- Include target token/value or key measurement in the caption when useful.
-- For repeated issues, use one representative image and list affected locations.
-- For missing counterpart or unmatched baseline, create a paired placeholder or matrix evidence image.
+- Create **one image per issue**. Do not use a single overview image as the only evidence for multiple issues.
+- Use a side-by-side comparison image whenever a design screenshot is available: **left = design baseline**, **right = implementation**.
+- Add a title above the image such as `Issue 2: active blue token mismatch`.
+- Above or near the left/design side, label the correct design information, for example `Design: Figma token accent/... #29A9FF`, `Design: width 360px`, or `Design: radius 24px`.
+- Above or near the right/implementation side, label the implemented information, for example `Implementation: source rgba(40,116,254) / sampled #367BF8`, `Implementation: screenshot height 88px`, or `Implementation: component prop disabled=false`.
+- Use exact values whenever Figma Dev/node data, design tokens, component specs, source code, or implementation tokens provide exact values. Do not write `approx`, `about`, `roughly`, `around`, `视觉约`, `大约`, or `约` for those values.
+- Use screenshot sampling values only as secondary evidence when exact source/design values are unavailable or to explain rendered anti-aliasing. Label them explicitly as `sampled` / `截图采样`, not as the source of truth.
+- If exact Figma and code values conflict with sampled screenshot colors or sizes, report the exact Figma/code values first and mention sampling only as supporting evidence.
+- Draw red boxes around the affected element on both the design side and implementation side when both counterparts exist.
+- Use red fine outlines, issue number badges, pointer lines, and outside note areas when useful, but avoid covering the UI being reviewed.
+- Use a dark or neutral header band above the screenshot crops for the issue title and measurement labels, matching the provided reference style when possible.
+- Keep comparison crops visually aligned: use the same viewport scale, same crop bounds, and same element position whenever possible. If screenshots have different pixel densities, resize the implementation to the design screenshot's logical size before cropping.
+- The image title and both side labels must be fully readable. **Do not allow label text to be clipped, truncated, overlapped, or broken mid-word / mid-token.** Increase canvas width, header height, or font size/line height as needed.
+- Wrap long labels only at natural boundaries such as spaces, punctuation, `/`, `:` or `→`; never split hex colors, token names, file names, numbers with units, or CSS/RN values across lines.
+- If a label is still too long, shorten it semantically while preserving the key design value and implementation value, then put the full detail in the issue block text below the image.
+- Keep at least 12px padding around title/label text and at least 16px spacing between the left and right panels so text and red boxes do not collide.
+- Use red boxes only for the actual differing element, not the whole screen, unless the whole container is the issue.
+- Save evidence images with stable names such as `issue-01-short-title.png`, ordered the same as the report. Prefer PNG output at a readable document width; when embedding in collaborative docs, use a width around `760` unless the document layout requires otherwise.
+- For repeated issues, still provide one representative side-by-side image and list all affected locations in the issue text.
+- If no design screenshot is available but a spec/token baseline exists, create a comparison image with a left-side spec/token panel and right-side implementation crop.
+- If neither design screenshot nor spec/token baseline exists, do not create a fake comparison image. Ask whether to continue with a risk report; if the user agrees, mark evidence as `Baseline missing` / `Needs confirmation`.
 - For token/spec not found, annotate the affected element and mark it as `Spec not found`, not as a confirmed visual bug.
 
 Markdown image format:
@@ -215,7 +238,7 @@ For a strict final review, include these sections in order:
 
 1. Input inventory and privacy handling.
 2. Page/state pairing matrix.
-3. Baseline sources and token/component references.
+3. Baseline acquisition record, sources, and token/component references.
 4. Overall score and issue counts.
 5. Full visible-element coverage index.
 6. Typography review table.
@@ -223,7 +246,7 @@ For a strict final review, include these sections in order:
 8. Icon/asset review table.
 9. State and interaction visual review table.
 10. Layout/spacing/container review table.
-11. Annotated evidence images.
+11. Per-issue side-by-side comparison evidence images.
 12. Confirmed issue list.
 13. Needs-confirmation, risk, and coverage gaps.
 14. Content/state differences excluded from UI issue count.
@@ -252,14 +275,14 @@ Do not use vague conclusions such as `basically consistent`, `looks close`, or `
 ```markdown
 #### X. Issue title using a visible element name
 
-![Issue X: annotated evidence](/absolute/path/to/annotated-image.png)
+![Issue X: side-by-side design vs implementation comparison](/absolute/path/to/comparison-image.png)
 
 - **Severity**: P0 / P1 / P2 / P3 / Needs confirmation
 - **Dimension**: Color / Typography / Spacing / Radius / Layout / Hierarchy / Icon / Asset / Chart / State
 - **Location**: Specific visible location in the screen
 - **Baseline**: Design token, component spec, Figma value, public design-system rule, or visual baseline
 - **Implementation**: What the implementation currently shows
-- **Quantified difference**: e.g. `gap 12px vs 8px`, `height -4px`, `dx +5px`, `target #000000CC vs rendered #00000099`
+- **Quantified difference**: e.g. `gap 12px vs 8px`, `height -4px`, `dx +5px`, `target #000000CC vs rendered #00000099`. Use exact Figma/code/token values when available; use approximate language only when the value comes solely from visual estimation or screenshot sampling.
 - **Component/token check**: Whether the correct component, variant, state, and token are used
 - **Root cause**: Component choice, prop, token, layout rule, state gate, asset mismatch, hardcoded style, or unknown
 - **Recommendation**: Actionable fix for design or engineering
@@ -270,10 +293,18 @@ Do not use vague conclusions such as `basically consistent`, `looks close`, or `
 
 Before calling a strict review complete, verify:
 
+- Figma design screenshot and node values were attempted first when a Figma link/node was provided.
+- If Figma was unavailable, design specs / knowledge base / design tokens were checked before screenshot-only review.
+- If no baseline existed, the user was asked whether to continue and the report avoids strict fidelity scoring.
 - Pairing level and state assumptions are stated.
 - Every visible element appears in the coverage index.
 - Text, icons, state, spacing, and containers are checked separately.
 - Confirmed issues have evidence, severity, baseline, implementation behavior, measurement, and recommendation.
+- Each confirmed issue has exactly one primary comparison image, preferably side-by-side with design on the left and implementation on the right.
+- Each comparison image labels both the design-correct information and implementation information, and red-boxes the affected element.
+- Evidence image titles and labels are readable with no clipping, overlap, truncation, or broken mid-token text.
+- Exact Figma Dev/node values, design-token values, component-spec values, and source-code values are reported without approximate wording such as `约`, `大约`, `around`, or `roughly`.
+- Screenshot sampling or visual-estimate values are explicitly labeled as such and are not presented as source-of-truth values.
 - Needs-confirmation items are not counted as confirmed issues.
 - Pure content/data differences are excluded and listed separately.
 - Sensitive names, internal URLs, private tool names, credentials, customer data, and unreleased details are removed or generalized.
